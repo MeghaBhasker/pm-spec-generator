@@ -24,3 +24,23 @@ a{color:var(--accent);text-decoration:none;}
 ::-webkit-scrollbar{width:5px;height:5px;}
 ::-webkit-scrollbar-track{background:var(--cream-2);}
 ::-webkit-scrollbar-thumb{background:var(--cream-3);border-radius:3px;}
+
+/* ── Tokens ── */
+:root {
+  --cream: #FAF8F4;
+  --cream-2: #F3F0EA;
+  --cream-3: #E8E3D8;
+  --ink: #1A1714;
+  --ink-2: #4A4540;
+  --ink-3: #9A948C;
+  --accent: #C8471A;
+  --teal: #1A6B5A;
+  --border: #E2DDD6;
+  --border-strong: #C8C2B8;
+  --mono: 'DM Mono', 'Fira Mono', monospace;
+  --serif: 'Fraunces', Georgia, serif;
+  --r: 6px;
+  --rl: 10px;
+  --header-h: 52px;
+  --toolbar-h: 48px;
+}
