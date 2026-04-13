@@ -1,7 +1,7 @@
-/* ── App shell ── */
+/* â”€â”€ App shell â”€â”€ */
 .app { display: flex; flex-direction: column; height: 100vh; overflow: hidden; background: var(--cream); }
 
-/* ── Header ── */
+/* â”€â”€ Header â”€â”€ */
 .header {
   height: var(--header-h); display: flex; align-items: center; justify-content: space-between;
   padding: 0 20px; border-bottom: 1px solid var(--border);
@@ -13,7 +13,7 @@
 .lt { color: var(--ink); }
 .tagline { font-size: 11px; color: var(--ink-3); font-weight: 300; letter-spacing: 0.02em; }
 
-/* ── Language pills ── */
+/* â”€â”€ Language pills â”€â”€ */
 .langRow { display: flex; gap: 4px; }
 .langPill {
   padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: 500;
@@ -24,7 +24,7 @@
 .langPill:hover { border-color: var(--ink); color: var(--ink); }
 .langPillActive { background: var(--ink) !important; color: var(--cream) !important; border-color: var(--ink) !important; }
 
-/* ── Tool bar ── */
+/* â”€â”€ Tool bar â”€â”€ */
 .toolBar {
   height: var(--toolbar-h); display: flex; align-items: center; gap: 4px;
   padding: 0 16px; border-bottom: 1px solid var(--border);
@@ -45,13 +45,13 @@
   border-color: var(--ink) !important; font-weight: 400 !important;
 }
 
-/* ── Workspace ── */
+/* â”€â”€ Workspace â”€â”€ */
 .workspace {
   flex: 1; display: grid; grid-template-columns: 1fr 1fr;
   overflow: hidden; min-height: 0;
 }
 
-/* ── Conversation panel ── */
+/* â”€â”€ Conversation panel â”€â”€ */
 .convPanel {
   display: flex; flex-direction: column; border-right: 1px solid var(--border);
   overflow: hidden; background: var(--cream);
@@ -172,7 +172,7 @@
 .sendBtn:disabled { opacity: 0.4; cursor: not-allowed; }
 .inputHint { font-size: 10px; color: var(--ink-3); margin-top: 5px; text-align: right; }
 
-/* ── Output panel ── */
+/* â”€â”€ Output panel â”€â”€ */
 .outputPanel { display: flex; flex-direction: column; overflow: hidden; background: #fff; }
 
 .outputTabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); background: var(--cream-2); overflow-x: auto; flex-shrink: 0; min-height: 38px; align-items: stretch; scrollbar-width: none; }
@@ -202,7 +202,7 @@
 .outputPlaceholderIcon { font-size: 28px; color: var(--ink-3); margin-bottom: 4px; }
 .outputPlaceholderSub { font-size: 11px; color: var(--ink-3); }
 
-/* ── Markdown rendering ── */
+/* â”€â”€ Markdown rendering â”€â”€ */
 .mdBlock { display: flex; flex-direction: column; gap: 4px; }
 .mdSection {
   border-left: 3px solid var(--accent); padding: 5px 10px;
@@ -219,7 +219,7 @@
 .mdTable { font-size: 11px; font-family: var(--mono); color: var(--ink-2); padding: 2px 0; }
 .mdSpacer { height: 8px; }
 
-/* ── Code blocks ── */
+/* â”€â”€ Code blocks â”€â”€ */
 .codeBlock { border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; margin: 8px 0; }
 .codeHeader { display: flex; justify-content: space-between; align-items: center; padding: 6px 12px; background: var(--ink); }
 .codeLang { font-size: 10px; color: #94A3B8; font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.1em; }
@@ -227,9 +227,13 @@
 .codeCopy:hover { background: rgba(255,255,255,0.2); color: #fff; }
 .codePre { background: #0F172A; color: #E2E8F0; padding: 14px 16px; overflow-x: auto; font-size: 12px; line-height: 1.6; font-family: var(--mono); }
 
-/* ── Inputs global ── */
+/* â”€â”€ Inputs global â”€â”€ */
 
 @keyframes blink { 0%,80%,100%{opacity:0.2} 40%{opacity:1} }
 
 @media (max-width: 768px) {
   .workspace { grid-template-columns: 1fr; }
+  .outputPanel { display: none; }
+  .toolBar { gap: 3px; }
+  .toolPill { font-size: 10px; padding: 4px 8px; }
+}
