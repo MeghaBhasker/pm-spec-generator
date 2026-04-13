@@ -172,18 +172,23 @@ export default function Home(){
     setOutputTabs(prev=>{const next=prev.filter(t=>t.id!==id);if(activeTabId===id)setActiveTabId(next[0]?.id||null);return next})
   }
 
-  const handleFileAttach=useCallback(async(file:File)=>{
-    const reader=new FileReader()
-    reader.onload=async(e)=>{
-      const content=e.target?.result as string
-      setAttachedFiles(prev=>[...prev,{name:file.name,content,type:file.type}])
-      // Try memory extraction
-      try{
-        const res=await fetch('/api/extract-memory',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({content:content.slice(0,8000),filename:file.name})})
-        if(res.ok){const data=await res.json();if(data.memory){setMemory(prev=>({...prev,...data.memory}));setMessages(p=>[...p,{role:'assistant',content:`I've read **${file.name}** and extracted context. Check Memory tool to review.`}])}}
-      }catch{}
+  const handleFileAttach=useCallback(async(files:FileList|File[])=>{
+    const fileArr=Array.from(files)
+    for(const file of fileArr){
+      const reader=new FileReader()
+      reader.onload=async(e)=>{
+        const fileContent=e.target?.result as string
+        setAttachedFiles(prev=>[...prev,{name:file.name,content:fileContent,type:file.type}])
+        // Try memory extraction for docs
+        if(file.type!=='text/csv'&&!file.name.endsWith('.csv')){
+          try{
+            const res=await fetch('/api/extract-memory',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({content:fileContent.slice(0,8000),filename:file.name})})
+            if(res.ok){const data=await res.json();if(data.memory&&Object.keys(data.memory).length>0){setMemory(prev=>({...prev,...data.memory}));setMessages(p=>[...p,{role:'assistant',content:`I've read **${file.name}** and extracted context into your Memory notes.`}])}}
+          }catch{}
+        }
+      }
+      reader.readAsText(file)
     }
-    reader.readAsText(file)
   },[])
 
   function formatRisk(r:{summary:string;overall_risk:string;risk_score:number;top_3_to_address:string[];risks:{category:string;title:string;description:string;severity:string;probability:string;mitigation:string;owner:string}[]}):string{
@@ -203,7 +208,7 @@ export default function Home(){
   }
 
   const buildPrompt=useCallback(():{endpoint:string;body:object;histTitle:string}|null=>{
-    const fileContext=attachedFiles.length>0?'\n\nAttached:\n'+attachedFiles.map(f=>`[${f.name}]:\n${f.content.slice(0,3000)}`).join('\n\n'):''
+    const fileContext=attachedFiles.length>0?'\n\nAttached files — use this content to inform your output:\n'+attachedFiles.map(f=>`\n### ${f.name}\n${f.content.slice(0,6000)}`).join('\n'):''
     const mem=memCtx+fileContext
     switch(activeTool){
       case'spec':return{endpoint:'generate',body:{feature:input,productType,primaryUser,sections:SECTIONS.filter(s=>sections.has(s.id)).map(s=>s.label),language,memoryContext:mem},histTitle:input}
@@ -430,7 +435,16 @@ export default function Home(){
 
           {/* Input area */}
           {activeTool!=='memory'&&activeTool!=='prompts'&&activeTool!=='history'&&(
-            <div className={styles.inputArea}>
+            <div
+              className={styles.inputArea}
+              onDragOver={e=>{e.preventDefault();e.currentTarget.classList.add(styles.inputAreaDrag)}}
+              onDragLeave={e=>{e.currentTarget.classList.remove(styles.inputAreaDrag)}}
+              onDrop={e=>{
+                e.preventDefault();e.currentTarget.classList.remove(styles.inputAreaDrag)
+                const files=e.dataTransfer.files
+                if(files.length>0)handleFileAttach(files)
+              }}
+            >
               {attachedFiles.length>0&&(
                 <div className={styles.attachedFiles}>
                   {attachedFiles.map((f,i)=>(
@@ -439,12 +453,12 @@ export default function Home(){
                 </div>
               )}
               <div className={styles.inputRow}>
-                <button className={styles.attachBtn} onClick={()=>fileInputRef.current?.click()} title="Attach file">📎</button>
-                <input ref={fileInputRef} type="file" style={{display:'none'}} accept=".pdf,.txt,.md,.csv" onChange={e=>{const f=e.target.files?.[0];if(f)handleFileAttach(f);e.target.value=''}}/>
+                <button className={styles.attachBtn} onClick={()=>fileInputRef.current?.click()} title="Attach files (or drag & drop)">📎</button>
+                <input ref={fileInputRef} type="file" style={{display:'none'}} accept=".pdf,.txt,.md,.csv" multiple onChange={e=>{if(e.target.files&&e.target.files.length>0)handleFileAttach(e.target.files);e.target.value=''}}/>
                 <textarea className={styles.chatInput} placeholder={PLACEHOLDERS[activeTool]} value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>{if(e.key==='Enter'&&(e.metaKey||e.ctrlKey))send()}} rows={3}/>
-                <button className={styles.sendBtn} onClick={send} disabled={!input.trim()||loading}>{loading?'…':'→'}</button>
+                <button className={styles.sendBtn} onClick={send} disabled={(!input.trim()&&attachedFiles.length===0)||loading}>{loading?'…':'→'}</button>
               </div>
-              <div className={styles.inputHint}>⌘ + Enter to send</div>
+              <div className={styles.inputHint}>⌘ + Enter · drag & drop files · {attachedFiles.length>0?`${attachedFiles.length} file${attachedFiles.length>1?'s':''} attached`:''}</div>
             </div>
           )}
         </div>
